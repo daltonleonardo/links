@@ -1,0 +1,283 @@
+Angular Mat Date Mask Pending (forked)
+https://stackblitz.com/edit/angular-mat-date-mask-pending-bjtvht?file=app%2Fdatepicker-overview-example.html
+
+  datepicker-overview-example.html
+        <mat-form-field>
+            <input type="hidden" [matDatepicker]="picker" [(ngModel)]='value'>
+            <input matInput [textMask]="mask" [ngModel]="value | date:'MM/dd/yyyy'" (blur)="onBlur()" (change)='todate($event.target.value)'>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker (selectedChanged)="onChange($event)" #picker></mat-datepicker>
+        </mat-form-field>
+
+        {{ innerValue }}
+
+  datepicker-overview-example.ts
+  
+        import { Component, OnInit, Input, Output, forwardRef, EventEmitter } from '@angular/core';
+        import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
+
+
+        export const CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR: any = {
+          provide: NG_VALUE_ACCESSOR,
+          useExisting: forwardRef(() => DatepickerOverviewExample),
+          multi: true
+        };
+
+        const noop = () => {
+        };
+
+        /** @title Basic datepicker */
+        @Component({
+          selector: 'datepicker-overview-example',
+          templateUrl: 'datepicker-overview-example.html',
+          styleUrls: ['datepicker-overview-example.css'],
+          providers: [
+            CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR
+          ],
+        })
+
+        export class DatepickerOverviewExample implements ControlValueAccessor {
+          public mask = {
+            guide: true,
+            showMask: true,
+            // keepCharPositions : true,
+            mask: [/\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]
+          };
+
+
+          innerValue: Date = new Date();
+
+          //Placeholders for the callbacks which are later provided
+          //by the Control Value Accessor
+          private onTouchedCallback: () => void = noop;
+          private onChangeCallback: (_: any) => void = noop;
+
+
+          //get accessor
+          get value(): Date {
+            return this.innerValue;
+          };
+
+          //set accessor including call the onchange callback
+          set value(v: Date) {
+            if (v !== this.innerValue) {
+              this.innerValue = v;
+            }
+          }
+          //Occured value changed from module
+          writeValue(value: any): void {
+            if (value !== this.innerValue) {
+              this.innerValue = value;
+            }
+          }
+
+          registerOnChange(fn: any): void {
+            this.onChangeCallback = fn;
+          }
+
+          registerOnTouched(fn: any): void {
+            this.onTouchedCallback = fn;
+          }
+
+          onChange(event) {
+            // console.log(event);
+            this.value = event;
+            this.onBlur();
+          }
+
+          todate(value){
+            this.value = new Date(value);
+          }
+
+          onBlur() {
+            this.onChangeCallback(this.innerValue);
+          }
+        }
+
+
+           
+ main.ts
+ 
+        import './polyfills';
+        import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
+        import {BrowserModule} from '@angular/platform-browser';
+        import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+        import {NgModule} from '@angular/core';
+        import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+        import {
+          MatAutocompleteModule,
+          MatButtonModule,
+          MatButtonToggleModule,
+          MatCardModule,
+          MatCheckboxModule,
+          MatChipsModule,
+          MatDatepickerModule,
+          MatDialogModule,
+          MatExpansionModule,
+          MatGridListModule,
+          MatIconModule,
+          MatInputModule,
+          MatListModule,
+          MatMenuModule,
+          MatNativeDateModule,
+          MatPaginatorModule,
+          MatProgressBarModule,
+          MatProgressSpinnerModule,
+          MatRadioModule,
+          MatRippleModule,
+          MatSelectModule,
+          MatSidenavModule,
+          MatSliderModule,
+          MatSlideToggleModule,
+          MatSnackBarModule,
+          MatSortModule,
+          MatTableModule,
+          MatTabsModule,
+          MatToolbarModule,
+          MatTooltipModule,
+          MatStepperModule,
+        } from '@angular/material';
+        import { TextMaskModule } from 'angular2-text-mask';
+        import {DatepickerOverviewExample} from './app/datepicker-overview-example';
+        import {AppComponent} from './app/app.component';
+        import {HttpModule} from '@angular/http';
+        import {HttpClientModule} from '@angular/common/http';
+        import {CdkTableModule} from '@angular/cdk/table';
+
+        @NgModule({
+          exports: [
+            CdkTableModule,
+            MatAutocompleteModule,
+            MatButtonModule,
+            MatButtonToggleModule,
+            MatCardModule,
+            MatCheckboxModule,
+            MatChipsModule,
+            MatStepperModule,
+            MatDatepickerModule,
+            MatDialogModule,
+            MatExpansionModule,
+            MatGridListModule,
+            MatIconModule,
+            MatInputModule,
+            MatListModule,
+            MatMenuModule,
+            MatNativeDateModule,
+            MatPaginatorModule,
+            MatProgressBarModule,
+            MatProgressSpinnerModule,
+            MatRadioModule,
+            MatRippleModule,
+            MatSelectModule,
+            MatSidenavModule,
+            MatSliderModule,
+            MatSlideToggleModule,
+            MatSnackBarModule,
+            MatSortModule,
+            MatTableModule,
+            MatTabsModule,
+            MatToolbarModule,
+            MatTooltipModule,
+          ]
+        })
+        export class DemoMaterialModule {}
+
+        @NgModule({
+          imports: [
+            BrowserModule,
+            BrowserAnimationsModule,
+            FormsModule,
+            HttpModule,
+            HttpClientModule,
+            DemoMaterialModule,
+            MatNativeDateModule,
+            ReactiveFormsModule,
+            TextMaskModule
+          ],
+          entryComponents: [DatepickerOverviewExample, AppComponent],
+          declarations: [DatepickerOverviewExample, AppComponent],
+          bootstrap: [AppComponent],
+          providers: []
+        })
+        export class AppModule {}
+
+        platformBrowserDynamic().bootstrapModule(AppModule);
+
+ package.json
+        {
+          "name": "angular-mat-date-mask-pending",
+          "version": "0.0.0",
+          "private": true,
+          "dependencies": {
+            "rxjs": "5.5.6",
+            "core-js": "2.5.3",
+            "ng-mask": "3.1.1",
+            "zone.js": "0.8.20",
+            "hammerjs": "2.0.8",
+            "@angular/cdk": "5.0.0-rc.3",
+            "@angular/core": "5.2.2",
+            "@angular/http": "5.2.2",
+            "@angular/forms": "5.2.2",
+            "@angular/common": "5.2.2",
+            "@angular/router": "5.2.2",
+            "@angular/compiler": "5.2.2",
+            "@angular/material": "5.0.0-rc.3",
+            "web-animations-js": "2.3.1",
+            "angular2-text-mask": "8.0.4",
+            "@angular/animations": "5.2.2",
+            "@angular/platform-browser": "5.2.2",
+            "angular-in-memory-web-api": "0.5.3",
+            "@angular/platform-browser-dynamic": "5.2.2"
+          },
+          "scripts": {
+            "ng": "ng",
+            "start": "ng serve",
+            "build": "ng build",
+            "test": "ng test",
+            "lint": "ng lint",
+            "e2e": "ng e2e"
+          },
+          "devDependencies": {
+            "@angular-devkit/build-angular": "~0.1100.4",
+            "@angular/cli": "~11.0.4",
+            "@angular/compiler-cli": "~11.0.4",
+            "@types/jasmine": "~3.6.0",
+            "@types/node": "^12.11.1",
+            "codelyzer": "^6.0.0",
+            "jasmine-core": "~3.6.0",
+            "jasmine-spec-reporter": "~5.0.0",
+            "karma": "~5.1.0",
+            "karma-chrome-launcher": "~3.1.0",
+            "karma-coverage": "~2.0.3",
+            "karma-jasmine": "~4.0.0",
+            "karma-jasmine-html-reporter": "^1.5.0",
+            "protractor": "~7.0.0",
+            "ts-node": "~8.3.0",
+            "tslint": "~6.1.0",
+            "typescript": "~4.0.2"
+          }
+        }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
