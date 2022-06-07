@@ -1,0 +1,211 @@
+
+mock-server\data\dominiosParams\dominiosParams116.ts
+      module.exports = {
+          fnc(req) {
+
+              // Opções de retorno de Dados
+              const typeReponse = {
+                  SucessDataValue: 'SucessDataValue', //  retorno padrão com sucesso e com lista de dados preenchidos.
+                  SucessDataEmpty: 'SucessDataEmpty', //  retorno alternativo com sucesso e com lista de dados vazia.
+                  ErrorDataValue: 'ErrorDataValue', // retorno alternativo com erro e com objeto de erro preenchido.
+                  ErrorDataEmpty: 'ErrorDataEmpty' // retorno alternativo com erro e com objeto de erro vazio
+              };
+
+              // tslint:disable-next-line: prefer-const
+              let typeReponseData = typeReponse.SucessDataValue;
+
+              // Opções de tempo para execução o endpopint em segundos
+              const timeResponse = {
+                  timeDefault: 0, // retorno padrão e rápido sem timeout.
+                  timeOptional2000: 2000, // retorno alternativo com timeout curto.
+                  timeOptional5000: 5000 // retorno alternativo com timeout longo.
+              };
+              // tslint:disable-next-line: prefer-const
+              let timeResponseData = timeResponse.timeDefault;
+
+              let messageError = 'Sua consulta não retornou registros';
+              let dataResponse;
+              let statusResponse = 200;
+
+              if (req && req.codigoDominio &&
+                  +req.codigoDominio === 100) {
+                  typeReponseData = typeReponse.ErrorDataValue;
+                  messageError = `Não foi possível obter dados do pedido ${req.codigoDominio}`;
+              }
+
+              switch (typeReponseData) {
+
+                  case 'SucessDataValue':
+
+                      if (req) {
+                           dataResponse = require('./dominiosParamsStatusPedido.json');
+                      }
+                      break;
+
+                  case 'SucessDataEmpty':
+                      dataResponse = [];
+                      break;
+
+                  case 'ErrorDataValue':
+                      statusResponse = 400;
+                      dataResponse = {
+                          error: {
+                              mensagens: [
+                                  {
+                                      codigo: statusResponse,
+                                      mensagem: messageError
+                                  }
+                              ],
+                              dataOcorrencia: new Date().toString(),
+                              fonte: 'error.generalError',
+                              tipo: 'SISTEMA',
+                              additionalInfo: null
+                          }
+                      };
+                      break;
+
+                  case 'ErrorDataEmpty':
+                      statusResponse = 500;
+                      dataResponse = {};
+                      break;
+
+                  default:
+
+              }
+              return {
+                  timeResponse: timeResponseData,
+                  statusResponse,
+                  dataResponse
+              };
+          }
+      };
+
+
+site-web\mock-server\server.ts
+        const dominiosParams116 = require('./data/dominiosParams/dominiosParams116.ts');
+
+        const paths = require('./routes.json');
+
+        let statusResponse = 200;
+        let dataResponse;
+        let timeResponse = 0;
+
+        const data = {
+          pedidosDocumento: {},
+          pedidosDocumentoparams: {}
+        };
+
+        let jsonServer = require('json-server');
+        let server = jsonServer.create();
+        let router = jsonServer.router(data, { _isFake: true });
+        let middlewares = jsonServer.defaults();
+
+        server.use(middlewares);
+        router.render = (req, res) => {
+
+          console.log('.'.repeat(60));
+          console.log('');
+          console.log('Data/Hora:', new Date().toLocaleString());
+          console.log(`req.url: ${req.url}`);
+          console.log('');
+          console.log(`req.query: ${JSON.stringify(req.query)}`);
+          console.log('');
+          console.log(`req.params: ${JSON.stringify(req.params)}`);
+          console.log('');
+
+          console.log(`req: ${req}`);
+
+
+          if (req.url.includes('dominios/')) {
+             // Todo: ajustar o json-server para obter os parametros através do req.params
+             const pos = req.url.indexOf('dominios/');
+             const url = req.url.substr(pos, req.url.length);
+             req.params.codigoDominio = url.split('/')[1];
+
+
+             console.log(' req.params.codigoDominio: ', req.params.codigoDominio);
+
+            switch (+req.params.codigoDominio) {
+
+              case 116: // Staut Pedido
+
+
+                   const fncResponse = dominiosParams116.fnc(req.params);
+
+
+                   setTimeout(() => {
+                    res.status(fncResponse.statusResponse).jsonp(fncResponse.dataResponse);
+                  }, fncResponse.timeResponse);
+
+                  break;
+
+              case 130: // Tipo pedido
+
+
+                    const fncResponse1 = dominiosParams130.fnc(req.params);
+
+                    setTimeout(() => {
+                      res.status(fncResponse1.statusResponse).jsonp(fncResponse1.dataResponse);
+                    }, fncResponse1.timeResponse);
+
+                  break;
+
+              default:
+                  console.log('');
+
+          }
+
+          } else if (req.url.includes('pedidosteste/')) {
+            // Todo: ajustar o json-server para obter os parametros através do req.params
+            const pos = req.url.indexOf('pedidosdocumento/');
+            const url = req.url.substr(pos, req.url.length);
+            req.params.codigoPedidoDocumento = url.split('/')[1];
+
+            const fncResponse3 = pedidosDocumentoParams.fnc(req.params);
+
+            setTimeout(() => {
+              res.status(fncResponse3.statusResponse).jsonp(fncResponse3.dataResponse);
+            }, fncResponse3.timeResponse);
+
+          } else if (req.url.includes('pedidosteste')) {
+
+            const fncResponse4 = pedidosDocumento.fnc(req.query);
+
+            setTimeout(() => {
+              res.status(fncResponse4.statusResponse).jsonp(fncResponse4.dataResponse);
+            }, fncResponse4.timeResponse);
+
+          } else {
+            dataResponse = res.locals.data;
+
+            setTimeout(() => {
+              res.status(statusResponse).jsonp(dataResponse);
+            }, timeResponse);
+          }
+
+          console.log(`dataResponse: ${JSON.stringify(dataResponse)}`);
+
+
+
+        };
+        server.use(jsonServer.rewriter(paths), router);
+
+        const mockPort = 8666;
+        server.listen(mockPort, () => console.log(`Mock Server: ON url: localhost://${mockPort}`));
+
+mock-server\package.json
+      {
+      "name": "mock-server",
+      "version": "1.0.0",
+      "description": "",
+      "main": "index.ts",
+      "scripts": {
+        "startold": "node server.ts",
+        "start": "nodemon --watch './**/*' -e ts,tsx --exec \"ts-node\" ./server.ts"
+      },
+      "author": "",
+      "license": "ISC",
+      "dependencies": {
+        "json-server": "^0.15.0"
+      }
+    }
