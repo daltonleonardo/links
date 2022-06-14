@@ -6,9 +6,51 @@ web
   src
     app
     
+    https://programandosolucoes.dev.br/2021/04/27/configurar-utilizar-nodemon/
 web\web\mock-server\server.ts
 
 sonar-project.properties
   sonar.exclusions=**/node_modules/**,**/*.spec.ts,**/src/app/shared/services/**,**/*.conf.js,**/main.ts,**/*routing.module.ts,**/environment.prod.ts,**/base-service.ts
+
+
+Como reiniciar seus aplicativos Node.js automaticamente com o nodemon
+https://www.digitalocean.com/community/tutorials/workflow-nodemon-pt
+
+Nodemon: como configurar e utilizar
+https://programandosolucoes.dev.br/2021/04/27/configurar-utilizar-nodemon/
+
+How Can I run/start json-server and live-server using NPM scripts start in package.json? [duplicate]
+https://stackoverflow.com/questions/62701824/how-can-i-run-start-json-server-and-live-server-using-npm-scripts-start-in-packa
+
+  "start": "concurrently \"json-server --watch db.json\" \"live-server\""
+  
+  
+  https://thinkster.io/tutorials/node-json-api/initializing-a-starter-node-project
+
+
+Configurando Node.js com TypeScript, nodemon e Jest
+https://danieldcs.com/configurando-node-js-com-typescript-nodemon-e-jest/
+
+
+Configuring nodemon with TypeScript
+https://blog.logrocket.com/configuring-nodemon-with-typescript/
+
+TypeScript — Use Nodemon to Restart Your Server on Changes
+https://futurestud.io/tutorials/typescript-use-nodemon-to-restart-your-server-on-changes
+
+
+Create new Node.js application with Express, TypeScript, Nodemon and ESLint
+https://dev.to/admirnisic/create-new-node-js-application-with-express-typescript-nodemon-and-eslint-f2l
+
+
+
+
+
+
+
+
+
+
+
 
 
