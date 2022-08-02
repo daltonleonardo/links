@@ -1,0 +1,55 @@
+import { Injectable } from '@angular/core';
+import { interval } from 'rxjs';
+import { switchMap, takeWhile, first } from 'rxjs/operators';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class PollingService {
+  
+  private searchLimit = 1200;
+  private processingTime = 2000;
+
+  constructor(private service: any) {}
+
+  initialize(param: any) {
+    return interval(this.processingTime).pipe(
+      switchMap(() => {
+        polling.count++;
+        return this.service
+          .getStatus({ id: param.id })
+          .pipe(first());
+      }),
+      takeWhile((response: any) => {
+        param.response = response;
+        return response.status === 4 && !param.isAborted && param.count < this.searchLimit;
+      }),
+    );
+  }
+}
+
+
+componente.ts
+
+public checkStatus(): void {
+    this.polling = { id: 10};
+
+    this.polling.event = this.service.initialize(this.polling).subscribe({
+      complete: () => {
+       //todo
+      },
+      error: (error) => {
+       //todo
+      },
+    });
+  }
+  
+  
+  download
+   const a = document.createElement('a');
+      a.href = excel.urlDownload;
+      a.download = excel.urlDownload.substr(excel.urlDownload.lastIndexOf('/') + 1);
+      a.target = '_blank';
+      a.type = 'application/octet-stream';
+      // start download
+      a.click();
